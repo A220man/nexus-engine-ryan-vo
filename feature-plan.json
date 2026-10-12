@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "current_feature": "context-sandboxing-engine",
+  "features": [
+    {
+      "id": "context-sandboxing-engine",
+      "title": "Context Sandboxing and Chunked Retrieval Engine",
+      "status": "done",
+      "acceptance": [
+        "Captures and sandboxes tool output exceeding size threshold into SQLite storage",
+        "Generates deterministic structural summary preview with line and byte counts",
+        "Indexes chunks with hard chunk-size limits to prevent database bloat",
+        "Provides targeted search and retrieval within sandboxed outputs without polluting active model context"
+      ],
+      "implementation": [
+        "backend/app/services/sandbox_service.py",
+        "backend/app/api/endpoints.py",
+        "backend/app/core/database.py"
+      ],
+      "tests": [
+        "backend/tests/test_sandbox.py"
+      ]
+    },
+    {
+      "id": "metrics-accounting",
+      "title": "Anti-Contradiction Context Savings Accounting",
+      "status": "planned",
+      "acceptance": [
+        "Enforces mathematical invariants so session savings never exceed global totals",
+        "Calculates true savings percentage strictly from diverted output",
+        "Reports zero savings when no tool execution was diverted"
+      ]
+    },
+    {
+      "id": "safe-platform-routing",
+      "title": "Safe Cross-Platform MCP Routing and Framing",
+      "status": "planned",
+      "acceptance": [
+        "Provides benign tool guidance framing across 17 IDE platforms",
+        "Eliminates prompt-injection false positives in auto-mode classifiers",
+        "Supports OpenCode v2 configuration and platform-specific exports"
+      ]
+    },
+    {
+      "id": "bounded-executor",
+      "title": "Watchdog-Enforced Bounded Execution Runner",
+      "status": "planned",
+      "acceptance": [
+        "Enforces wall-clock timeout bounding across command execution, indexing, and search",
+        "Supports abort signals to interrupt in-flight execution on user request",
+        "Reaps orphan child processes on parent termination"
+      ]
+    }
+  ]
+}

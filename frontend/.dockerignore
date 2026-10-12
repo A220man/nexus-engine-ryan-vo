@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.vite
+npm-debug.log*
+.git
+.gitignore
+tests
+*.test.ts
+*.test.tsx
