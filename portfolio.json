@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "name": "nexus-engine-ryan-vo",
+  "owner": "A220man",
+  "email": "ryandtvo@gmail.com",
+  "domain": "AI/ML developer tools",
+  "summary": "Work in progress: nexus-engine-ryan-vo",
+  "workflows": [
+    "Sandboxing and indexing high-volume agent tool execution outputs with chunked retrieval",
+    "Multi-session context savings accounting with anti-contradiction metric validation",
+    "Safety-framed cross-platform MCP routing and watchdog-enforced execution across 17 IDE environments"
+  ],
+  "auth": "oidc-keycloak-saml-broker",
+  "llm_providers": [
+    "openai-compatible",
+    "anthropic",
+    "gemini",
+    "ollama"
+  ],
+  "status": "work-in-progress"
+}

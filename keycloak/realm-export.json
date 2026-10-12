@@ -1,0 +1,58 @@
+{
+  "id": "nexus-realm",
+  "realm": "nexus-realm",
+  "enabled": true,
+  "displayName": "Nexus Engine Realm",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator role with full management permissions"
+      },
+      {
+        "name": "operator",
+        "description": "Operator role with execution and sandbox management permissions"
+      },
+      {
+        "name": "viewer",
+        "description": "Read-only viewer role for dashboards and metrics"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "nexus-engine-client",
+      "name": "Nexus Engine SPA",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "rootUrl": "http://127.0.0.1:3000",
+      "baseUrl": "http://127.0.0.1:3000",
+      "redirectUris": [
+        "http://127.0.0.1:3000/*"
+      ],
+      "webOrigins": [
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "saml-idp-broker",
+      "displayName": "Enterprise SAML Identity Provider",
+      "providerId": "saml",
+      "enabled": false,
+      "config": {
+        "singleSignOnServiceUrl": "https://idp.example.com/saml2/sso",
+        "nameIDPolicyFormat": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+        "wantAuthnRequestsSigned": "true",
+        "signatureAlgorithm": "RSA_SHA256"
+      }
+    }
+  ]
+}
