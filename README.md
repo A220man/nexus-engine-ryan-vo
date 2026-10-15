@@ -5,7 +5,7 @@
 
 Current version: `1.0.0`.
 
-Autonomous AI coding agents frequently saturate their context windows by ingesting unbounded tool outputs—such as recursive directory walks, verbose test suites, large diffs, and package build logs. Ingesting megabytes of raw text not only incurs massive token costs and latency, but degrades LLM reasoning attention and triggers aggressive premature compaction. **Nexus Engine** is an intelligent context optimization and MCP routing engine designed for AI coding agents and LLM developer tools. It transparently sandboxes high-volume tool outputs, stores and indexes chunked artifacts in persistent storage, delivers concise structured previews to active model context (achieving over 97% token reduction), and safely routes tool calls across 17 IDE agent platforms.
+Autonomous AI coding agents frequently saturate their context windows by ingesting unbounded tool outputs—such as recursive directory walks, verbose test suites, large diffs, and package build logs. Ingesting megabytes of raw text not only incurs massive token costs and latency, but degrades LLM reasoning attention and triggers aggressive premature compaction. **Nexus Engine** is an intelligent context optimization and MCP routing engine designed for AI coding agents and LLM developer tools. It transparently sandboxes high-volume tool outputs, stores and indexes chunked artifacts in persistent storage, delivers concise structural previews to active model context (yielding large reductions on high-volume outputs), and safely routes tool calls across 17 IDE agent platforms.
 
 ## Architecture
 
@@ -50,9 +50,9 @@ graph TD
    - Includes quiet mode and configurable tool guidance hints.
 
 5. **Bounded Execution Watchdog & Process Lifecycle Management**
-   - Enforces hard wall-clock timeouts spanning the complete execution, indexing, and search lifecycle.
-   - Supports graceful and immediate cancellation signals to prevent hung sessions.
-   - Implements parent process ID (`ppid`) monitoring and stdin EOF handlers to prevent orphaned child processes and CPU-pinning on Windows and Linux hosts.
+   - Enforces hard wall-clock timeouts spanning the complete execution, indexing, and search lifecycle (verified by `test_run_bounded_command_timeout`).
+   - Supports graceful and immediate cancellation signals to abort in-flight executions, including an "abort all" watchdog sentinel for callers that cannot correlate a server-generated execution id (verified by `test_abort_execution_signal`).
+   - In-flight abort uses process-group SIGTERM/SIGKILL teardown. Parent-process-death orphan reaping across host shutdown (issue #982) is a tracked follow-up, not yet implemented.
 
 6. **Opt-in Multi-Provider LLM Advisory Explanations**
    - Deterministic offline core functions completely without external API keys.
@@ -73,23 +73,24 @@ PYTHONPATH=backend python3 -m app.evaluation --dataset backend/app/data/eval_dat
 
 ### Data Provenance & Test Scenarios
 
-The benchmark dataset consists of 50 representative coding agent execution scenarios:
-- **Type A (Build & Test Logs):** Verbose pytest, npm test, and cargo test outputs (15–250 KB).
-- **Type B (File Scans & Diffs):** Large git diffs, directory walks, and ripgrep outputs (50–500 KB).
-- **Type C (Compiler & Runtime Errors):** Deep stack traces, TypeScript compiler diagnostics, and tracebacks (5–80 KB).
-- **Type D (Adversarial Classifiers):** Prompt strings evaluated against Claude Code and Copilot auto-mode permission classifier heuristics.
+The labeled evaluation dataset (`backend/app/data/eval_dataset.json`) contains 5 representative coding-agent execution scenarios:
+- **Type A (Build & Test Logs):** Verbose pytest output with trace elements and exit codes.
+- **Type B (File Scans & Diffs):** Git diff spanning multiple file hunks.
+- **Type C (Compiler & Runtime Errors):** TypeScript compiler diagnostics (`TS2322`) with exit codes.
+- **Type D (Adversarial Classifiers):** Prompt strings evaluated against Claude Code and Copilot auto-mode bypass heuristics, including an adversarial sample that trips the legacy `disregard prior` directive pattern.
 
-### Baseline vs Nexus Engine Results
+### Measured Results
 
-Measurements conducted on the evaluation dataset:
+Run the reproducible command above against the bundled 5-sample dataset to reproduce. The dataset is a small development set, so headline figures reflect current labeled data rather than production-scale benchmarks:
 
-| Metric | Unoptimized Baseline | Nexus Engine | Improvement |
-| :--- | :--- | :--- | :--- |
-| **Average Tool Output in Context** | 84,250 tokens | 1,840 tokens | **97.81% reduction** |
-| **Context Window Longevity** | ~18 turns to compaction | 480+ turns | **26.6x longer** |
-| **Search Retrieval Recall @ k=3** | N/A (entire text dumped) | 99.4% recall | Accurate targeting |
-| **Classifier Bypass False-Positive Rate** | 42.0% (legacy directives) | 0.0% (benign framing) | **Zero policy blocks** |
-| **Execution Watchdog Hang Rate** | 6.8% unkillable hangs | 0.0% (hard wall timeout) | Fail-safe guarantees |
+| Metric | Measured Value | Note |
+| :--- | :--- | :--- |
+| **Evaluated Samples** | 5 | Bundled dev dataset (`total_samples` in run output) |
+| **Average Raw Output** | 698.6 bytes | Per-sample raw tool output |
+| **Average Sandboxed Output** | 581.6 bytes | After structural preview summarization |
+| **Context Reduction Ratio** | 16.75% | Modest: most samples are small payloads that pass through near-verbatim |
+| **Search Retrieval Recall** | 100.0% | All `search_target` strings recovered from the chunked index |
+| **Classifier Safety Score** | 100.0% | Benign framing avoids all auto-mode-bypass patterns |
 
 ### Failure Cases & Limitations
 

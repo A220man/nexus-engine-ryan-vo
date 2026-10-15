@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "context-sandboxing-engine",
+  "current_feature": "bounded-executor",
   "features": [
     {
       "id": "context-sandboxing-engine",
@@ -44,11 +44,17 @@
     {
       "id": "bounded-executor",
       "title": "Watchdog-Enforced Bounded Execution Runner",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Enforces wall-clock timeout bounding across command execution, indexing, and search",
         "Supports abort signals to interrupt in-flight execution on user request",
         "Reaps orphan child processes on parent termination"
+      ],
+      "implementation": [
+        "backend/app/services/executor_service.py"
+      ],
+      "tests": [
+        "backend/tests/test_executor.py"
       ]
     }
   ]
