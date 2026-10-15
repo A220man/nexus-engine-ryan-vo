@@ -59,3 +59,10 @@ def test_abort_execution_signal(temp_db: str):
     assert aborted is True
     assert len(aborted_caught) == 1
     assert "aborted by client signal" in aborted_caught[0]
+
+
+def test_abort_all_returns_false_when_idle():
+    # Sentinel "any"/"*" with no in-flight execution must return False, not raise.
+    assert not ACTIVE_EXECUTIONS, "expected no in-flight executions at test start"
+    assert abort_execution("any") is False
+    assert abort_execution("*") is False

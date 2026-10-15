@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-context-sandboxing-engine
+bounded-executor
 
 ## Roadmap
 
@@ -42,10 +42,14 @@ Acceptance:
 
 ### bounded-executor — Watchdog-Enforced Bounded Execution Runner
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Enforces wall-clock timeout bounding across command execution, indexing, and search
 - Supports abort signals to interrupt in-flight execution on user request
 - Reaps orphan child processes on parent termination
+
+Implementation: `backend/app/services/executor_service.py`
+
+Tests: `backend/tests/test_executor.py`
 

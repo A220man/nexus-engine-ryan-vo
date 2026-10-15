@@ -103,8 +103,10 @@ def store_sandbox_payload(
     duration_ms: float = 0.0,
     platform: str = "generic",
     db_path: Optional[str] = None,
+    execution_id: Optional[str] = None,
 ) -> ExecutionResponse:
-    execution_id = f"exec_{uuid.uuid4().hex[:12]}"
+    if execution_id is None:
+        execution_id = f"exec_{uuid.uuid4().hex[:12]}"
     raw_bytes = len(raw_text.encode("utf-8"))
     now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
