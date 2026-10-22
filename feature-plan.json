@@ -44,7 +44,7 @@
     {
       "id": "bounded-executor",
       "title": "Watchdog-Enforced Bounded Execution Runner",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "Enforces wall-clock timeout bounding across command execution, indexing, and search",
         "Supports abort signals to interrupt in-flight execution on user request",

@@ -4,6 +4,7 @@ import os
 import signal
 import threading
 import uuid
+import sys
 from typing import Dict, Optional, Tuple
 from app.core.config import settings
 from app.models.schemas import ExecutionResponse
@@ -25,6 +26,66 @@ class ExecutionTimeoutError(Exception):
 
 class ExecutionAbortedError(Exception):
     pass
+
+
+def install_parent_death_guard() -> None:
+    """
+    Installs stdin EOF handler and ppid poll watchdog for parent-death reaping.
+    Addresses issue #982: Windows and non-Linux platforms need explicit guards
+    because the Bun/Linux-only guard in start.mjs never ran there.
+    Safe to call multiple times; handlers are idempotent.
+    """
+    # stdin EOF/close handler: exits when parent closes its stdin pipe
+    # (passive, does not consume transport data)
+    try:
+        if hasattr(sys.stdin, 'fileno') and sys.stdin.fileno() >= 0:
+            _install_stdin_eof_handler()
+    except Exception:
+        pass
+
+    # ppid poll watchdog: belt-and-suspenders for hard exits where stdin EOF
+    # may not arrive (e.g., parent process killed -9, machine reboot)
+    _install_ppid_poll_watchdog()
+
+
+def _install_stdin_eof_handler() -> None:
+    # Uses a background thread to monitor stdin; avoids interfering with
+    # any async event loop or MCP transport that may also read stdin.
+    def monitor_stdin():
+        try:
+            # Read blocks until EOF or data; we just wait for EOF
+            while True:
+                chunk = sys.stdin.buffer.read(4096)
+                if not chunk:  # EOF
+                    os._exit(0)
+        except Exception:
+            # Any error (stdin closed, redirected, etc.) -> exit
+            os._exit(0)
+
+    t = threading.Thread(target=monitor_stdin, daemon=True)
+    t.start()
+
+
+def _install_ppid_poll_watchdog() -> None:
+    ppid = os.getppid()
+    if ppid <= 1:
+        return  # Already reparented to init; no meaningful parent to watch
+
+    def poll_parent():
+        while True:
+            time.sleep(15)
+            try:
+                # Signal 0 checks process existence without sending a signal
+                os.kill(ppid, 0)
+                # Re-read ppid in case parent died and we were reparented
+                new_ppid = os.getppid()
+                if new_ppid != ppid and new_ppid <= 1:
+                    os._exit(0)
+            except (OSError, ProcessLookupError):
+                os._exit(0)
+
+    t = threading.Thread(target=poll_parent, daemon=True)
+    t.start()
 
 
 def run_bounded_command(

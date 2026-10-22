@@ -42,7 +42,7 @@ Acceptance:
 
 ### bounded-executor — Watchdog-Enforced Bounded Execution Runner
 
-Status: in_progress
+Status: done
 
 Acceptance:
 - Enforces wall-clock timeout bounding across command execution, indexing, and search
