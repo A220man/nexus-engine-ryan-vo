@@ -166,6 +166,8 @@ def run_bounded_command(
         with EXECUTION_LOCK:
             ACTIVE_EXECUTIONS.pop(temp_id, None)
             CANCELLATION_FLAGS.pop(temp_id, None)
+        cleanup_execution_mapping(execution_id)
+
 
     # Indexing/storage phase: also bounded by the same wall-clock deadline
     remaining_budget = deadline - time.time()

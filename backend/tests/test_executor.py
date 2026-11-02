@@ -6,6 +6,7 @@ from app.services.executor_service import (
     ExecutionTimeoutError,
     ExecutionAbortedError,
     ACTIVE_EXECUTIONS,
+    EXECUTION_ID_MAP,
 )
 
 
@@ -66,3 +67,57 @@ def test_abort_all_returns_false_when_idle():
     assert not ACTIVE_EXECUTIONS, "expected no in-flight executions at test start"
     assert abort_execution("any") is False
     assert abort_execution("*") is False
+def test_execution_id_map_cleaned_up_on_success(temp_db: str):
+    """EXECUTION_ID_MAP should be cleaned up after successful execution."""
+    assert not EXECUTION_ID_MAP, "map should start empty"
+    res = run_bounded_command(
+        command="echo 'test'",
+        timeout_seconds=5,
+        session_id="sess_cleanup",
+        db_path=temp_db,
+    )
+    assert res.status == "completed"
+    assert not EXECUTION_ID_MAP, "EXECUTION_ID_MAP should be empty after successful execution"
+
+
+def test_execution_id_map_cleaned_up_on_timeout(temp_db: str):
+    """EXECUTION_ID_MAP should be cleaned up after timeout."""
+    assert not EXECUTION_ID_MAP, "map should start empty"
+    with pytest.raises(ExecutionTimeoutError):
+        run_bounded_command(
+            command="sleep 2",
+            timeout_seconds=1,
+            session_id="sess_timeout_cleanup",
+            db_path=temp_db,
+        )
+    assert not EXECUTION_ID_MAP, "EXECUTION_ID_MAP should be empty after timeout"
+
+
+def test_execution_id_map_cleaned_up_on_abort(temp_db: str):
+    """EXECUTION_ID_MAP should be cleaned up after abort."""
+    import threading
+    assert not EXECUTION_ID_MAP, "map should start empty"
+
+    aborted_caught = []
+
+    def background_runner():
+        try:
+            run_bounded_command(
+                command="sleep 5",
+                timeout_seconds=10,
+                session_id="sess_abort_cleanup",
+                db_path=temp_db,
+            )
+        except ExecutionAbortedError as e:
+            aborted_caught.append(str(e))
+
+    thread = threading.Thread(target=background_runner)
+    thread.start()
+
+    time.sleep(0.3)
+    aborted = abort_execution("any")
+    thread.join(timeout=3.0)
+
+    assert aborted is True
+    assert len(aborted_caught) == 1
+    assert not EXECUTION_ID_MAP, "EXECUTION_ID_MAP should be empty after abort"
