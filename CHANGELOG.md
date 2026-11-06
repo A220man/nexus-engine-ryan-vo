@@ -1,8 +1,17 @@
 # Changelog
 
-## 1.4.0 — work-in-progress checkpoint
+## 1.5.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
+
+## 1.4.0 — work-in-progress checkpoint
+
+### Changes in this round
+- Marked metrics-accounting and safe-platform-routing as completed in feature-plan.json and PLAN.md
+- Verified all 36 backend tests pass and 4 frontend tests pass
+- Updated feature status tracking to reflect actual implementation state
+- Confirmed metrics invariants enforcement, zero-diverted zero-savings, 17-platform routing with OpenCode v2 and Pi abortable configs
+
 
 ## 1.3.0 — work-in-progress checkpoint
 

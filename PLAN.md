@@ -24,21 +24,29 @@ Tests: `backend/tests/test_sandbox.py`
 
 ### metrics-accounting — Anti-Contradiction Context Savings Accounting
 
-Status: planned
+Status: done
 
 Acceptance:
 - Enforces mathematical invariants so session savings never exceed global totals
 - Calculates true savings percentage strictly from diverted output
 - Reports zero savings when no tool execution was diverted
 
+Implementation: `backend/app/services/metrics_service.py`, `backend/app/api/endpoints.py`
+
+Tests: `backend/tests/test_metrics.py`
+
 ### safe-platform-routing — Safe Cross-Platform MCP Routing and Framing
 
-Status: planned
+Status: done
 
 Acceptance:
 - Provides benign tool guidance framing across 17 IDE platforms
 - Eliminates prompt-injection false positives in auto-mode classifiers
 - Supports OpenCode v2 configuration and platform-specific exports
+
+Implementation: `backend/app/services/routing_service.py`, `backend/app/api/endpoints.py`
+
+Tests: `backend/tests/test_routing.py`
 
 ### bounded-executor — Watchdog-Enforced Bounded Execution Runner
 
