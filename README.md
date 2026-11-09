@@ -155,6 +155,7 @@ Access the application dashboard at `http://127.0.0.1:3000` and backend API at `
 | `GET` | `/api/executions` | Viewer / Operator | Lists executions with pagination and filtering |
 | `GET` | `/api/executions/{id}` | Viewer / Operator | Retrieves execution detail, summary, and chunk links |
 | `POST` | `/api/executions/{id}/abort` | Operator / Admin | Aborts in-flight execution process |
+| `POST` | `/api/executions/abort-all` | Operator / Admin | Aborts all in-flight executions (watchdog escape hatch) |
 | `POST` | `/api/sandboxes` | Operator / Admin | Directly sandboxes external text payload |
 | `GET` | `/api/sandboxes/{id}/search` | Viewer / Operator | Targeted search within sandboxed output |
 | `GET` | `/api/metrics/summary` | Viewer / Operator | Retrieves global context savings metrics |
