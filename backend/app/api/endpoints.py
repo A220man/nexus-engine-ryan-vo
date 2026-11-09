@@ -213,6 +213,21 @@ def abort_running_execution(
     )
     return {"execution_id": execution_id, "aborted": success}
 
+@router.post("/executions/abort-all")
+def abort_all_executions(
+    user: UserContext = Depends(require_role(["operator", "admin"])),
+) -> Dict[str, Any]:
+    """Abort all currently running executions (watchdog escape hatch)."""
+    success = abort_execution("*")
+    log_audit(
+        user_sub=user.sub,
+        user_role=",".join(user.roles),
+        action="abort_all_executions",
+        resource="*",
+        details={"aborted": success},
+    )
+    return {"aborted": success}
+
 
 @router.post("/sandboxes", response_model=ExecutionResponse)
 def create_sandbox_payload(

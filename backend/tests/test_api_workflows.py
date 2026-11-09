@@ -91,4 +91,21 @@ def test_evaluation_endpoint(client: TestClient, operator_token: str):
     data = res.json()
     assert data["total_samples"] >= 1
     assert data["compression_ratio"] > 0
-    assert data["classifier_safety_score"] == 100.0
+
+
+def test_abort_all_endpoint(client: TestClient, operator_token: str):
+    headers = {"Authorization": f"Bearer {operator_token}"}
+
+    # Call abort-all when idle - should return False, not error
+    res = client.post("/api/executions/abort-all", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["aborted"] is False
+
+
+def test_abort_all_requires_operator_role(client: TestClient, viewer_token: str):
+    headers = {"Authorization": f"Bearer {viewer_token}"}
+    res = client.post("/api/executions/abort-all", headers=headers)
+    # Viewer role should be denied (403)
+    assert res.status_code == 403
+

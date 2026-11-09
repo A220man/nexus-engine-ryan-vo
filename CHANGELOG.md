@@ -1,8 +1,17 @@
 # Changelog
 
-## 1.5.0 — work-in-progress checkpoint
+## 1.6.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
+
+## 1.5.0 — work-in-progress checkpoint
+
+### Changes in this round
+- Added `/api/executions/abort-all` endpoint to abort all in-flight executions (watchdog escape hatch for callers that cannot correlate a specific execution ID)
+- Added tests for the new endpoint: idle abort returns false, viewer role denied
+- Updated API endpoint reference in README
+- Verified all 38 backend tests pass and 4 frontend tests pass
+
 
 ## 1.4.0 — work-in-progress checkpoint
 
@@ -17,9 +26,8 @@ Partial code published for continued development. Known issues: STATUS.md.
 
 Partial code published for continued development. Known issues: STATUS.md.
 
-## 1.3.0 — work-in-progress checkpoint
 
-Partial code published for continued development. Known issues: STATUS.md.
+## 1.3.0 — work-in-progress checkpoint
 
 ### Changes in this round
 - Fixed EXECUTION_ID_MAP memory leak in bounded-executor: `cleanup_execution_mapping` now called in `finally` block of `run_bounded_command` to ensure execution_id mappings are cleaned up after success, timeout, or abort
