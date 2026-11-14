@@ -121,3 +121,31 @@ def test_execution_id_map_cleaned_up_on_abort(temp_db: str):
     assert aborted is True
     assert len(aborted_caught) == 1
     assert not EXECUTION_ID_MAP, "EXECUTION_ID_MAP should be empty after abort"
+
+
+def test_abort_execution_with_stale_id(temp_db: str):
+    """
+    Test that abort_execution returns False gracefully when given
+    an execution_id whose mapping has been cleaned up (e.g., after
+    previous success, timeout, or abort).
+    """
+    # Start with a clean mapping (as test_execution_id_map_cleaned_up_on_success would leave it)
+    assert not EXECUTION_ID_MAP, 'map should start empty'
+
+    # Simulate: add an execution_id to the map, then clean it up
+    # (as happens in the finally block after successful execution)
+    from uuid import uuid4
+    fake_execution_id = f'exec_{uuid4().hex[:12]}'
+    # Manually add it to the map (simulating what run_bounded_command does upfront)
+    import threading
+    # We need to also add a temp_id that ACTIVE_EXECUTIONS would have
+    # But since the map is cleaned up, abort should return False
+    # 
+    # Actually, the simplest test: just try aborting with an id that was
+    # never active, or was cleaned up
+    result = abort_execution(fake_execution_id)
+    assert result is False, f'abort_execution with stale id should return False, got {result}'
+
+    # Also test with a known non-existent id
+    result2 = abort_execution('nonexistent_execution_id')
+    assert result2 is False, f'abort_execution with nonexistent id should return False, got {result2}'

@@ -217,7 +217,8 @@ def abort_execution(execution_id: str) -> bool:
     that cannot correlate a specific server-generated execution id with an
     in-flight tool call — e.g. the Pi MCP bridge cancelling a hung ctx_execute
     on Esc/Ctrl+C (issue #959). Returns True if at least one in-flight
-    execution was signalled.
+    execution was signalled. Returns False if the execution_id is not found
+    or the associated process has already completed/been cleaned up.
     """
     with EXECUTION_LOCK:
         if execution_id in ("any", "*"):
