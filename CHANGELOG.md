@@ -1,8 +1,17 @@
 # Changelog
 
+## 1.8.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.7.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
+
+### Changes in this round
+- Enhanced `abort_execution` docstring to precisely document return value semantics: distinguishes between 'execution signalled' (process terminated) vs 'execution not found/already completed'
+- All 39 backend tests pass (including `test_abort_execution_with_stale_id` and `test_abort_all_returns_false_when_idle`)
+- Docstring clarification within the already-completed bounded-executor feature
 
 ## 1.6.0 — work-in-progress checkpoint
 

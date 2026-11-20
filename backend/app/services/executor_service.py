@@ -216,9 +216,12 @@ def abort_execution(execution_id: str) -> bool:
     in-flight execution at once. This is a watchdog escape hatch for callers
     that cannot correlate a specific server-generated execution id with an
     in-flight tool call — e.g. the Pi MCP bridge cancelling a hung ctx_execute
-    on Esc/Ctrl+C (issue #959). Returns True if at least one in-flight
-    execution was signalled. Returns False if the execution_id is not found
-    or the associated process has already completed/been cleaned up.
+    on Esc/Ctrl+C (issue #959).
+
+    Returns True if at least one in-flight execution was signalled and the
+    associated process was terminated. Returns False if the execution_id is
+    not found, the associated process has already completed/been cleaned up,
+    or the sentinel values are used when no in-flight executions exist.
     """
     with EXECUTION_LOCK:
         if execution_id in ("any", "*"):
