@@ -3,7 +3,7 @@
 > Work in progress. This checkpoint may be incomplete or fail tests. See PLAN.md and STATUS.md before use.
 
 
-Current version: `1.8.0`.
+Current version: `1.9.0`.
 
 Autonomous AI coding agents frequently saturate their context windows by ingesting unbounded tool outputs—such as recursive directory walks, verbose test suites, large diffs, and package build logs. Ingesting megabytes of raw text not only incurs massive token costs and latency, but degrades LLM reasoning attention and triggers aggressive premature compaction. **Nexus Engine** is an intelligent context optimization and MCP routing engine designed for AI coding agents and LLM developer tools. It transparently sandboxes high-volume tool outputs, stores and indexes chunked artifacts in persistent storage, delivers concise structural previews to active model context (yielding large reductions on high-volume outputs), and safely routes tool calls across 17 IDE agent platforms.
 
