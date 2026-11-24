@@ -104,6 +104,9 @@ def run_bounded_command(
     3. Storage, bounded chunking, and preview indexing
     Addresses issues #947, #959, and #982.
     """
+    # Execution tracking IDs (initialized defensively; populated after Popen)
+    temp_id: Optional[str] = None
+
     effective_timeout = timeout_seconds or settings.MAX_EXECUTION_TIMEOUT_SECONDS
     start_time = time.time()
     deadline = start_time + effective_timeout
@@ -163,9 +166,11 @@ def run_bounded_command(
         exit_code = proc.returncode
 
     finally:
-        with EXECUTION_LOCK:
-            ACTIVE_EXECUTIONS.pop(temp_id, None)
-            CANCELLATION_FLAGS.pop(temp_id, None)
+        # Only cleanup temp_id if it was successfully assigned (Popen completed)
+        if temp_id is not None:
+            with EXECUTION_LOCK:
+                ACTIVE_EXECUTIONS.pop(temp_id, None)
+                CANCELLATION_FLAGS.pop(temp_id, None)
         cleanup_execution_mapping(execution_id)
 
 
