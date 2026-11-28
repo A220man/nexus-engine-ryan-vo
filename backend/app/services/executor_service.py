@@ -223,10 +223,18 @@ def abort_execution(execution_id: str) -> bool:
     in-flight tool call — e.g. the Pi MCP bridge cancelling a hung ctx_execute
     on Esc/Ctrl+C (issue #959).
 
-    Returns True if at least one in-flight execution was signalled and the
-    associated process was terminated. Returns False if the execution_id is
-    not found, the associated process has already completed/been cleaned up,
-    or the sentinel values are used when no in-flight executions exist.
+    Return value semantics:
+    - True:  At least one in-flight execution was signalled and its associated
+      process was terminated via the cancellation flag and terminate_process_group.
+    - False: The specified execution_id was not found in EXECUTION_ID_MAP,
+      OR the associated process had already completed or been cleaned up
+      (proc.poll() != None) prior to the abort call, OR the sentinel values
+      "any"/"*" were used when no in-flight executions existed.
+
+    Note: The function returns a boolean signal — it does not guarantee that the
+    process was terminated if it had already exited on its own.  The cancellation
+    flag is set before terminate, and the execution loop observes this flag via
+    CANCELLATION_FLAGS.get(temp_id, False) to raise ExecutionAbortedError.
     """
     with EXECUTION_LOCK:
         if execution_id in ("any", "*"):
